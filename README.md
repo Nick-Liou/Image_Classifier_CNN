@@ -1,7 +1,7 @@
-[![Mypy](https://github.com/Nick-Liou/Python_template/actions/workflows/mypy.yml/badge.svg)](https://github.com/Nick-Liou/Python_template/actions/workflows/mypy.yml)
-[![Tests](https://github.com/Nick-Liou/Python_template/actions/workflows/pytest.yml/badge.svg)](https://github.com/Nick-Liou/Python_template/actions/workflows/pytest.yml)
+[![Mypy](https://github.com/Nick-Liou/Image_Classifier_CNN/actions/workflows/mypy.yml/badge.svg)](https://github.com/Nick-Liou/Image_Classifier_CNN/actions/workflows/mypy.yml)
+[![Tests](https://github.com/Nick-Liou/Image_Classifier_CNN/actions/workflows/pytest.yml/badge.svg)](https://github.com/Nick-Liou/Image_Classifier_CNN/actions/workflows/pytest.yml)
 
-# Python_template
+# Image_Classifier_CNN
 A template for Python projects with github actions for 
 - tests (with pytest)
 - type anotations (with Mypy)
@@ -12,11 +12,11 @@ A template for Python projects with github actions for
 
 1. Clone this repository:   
     ```
-    git clone https://github.com/Nick-Liou/Python_template.git
+    git clone https://github.com/Nick-Liou/Image_Classifier_CNN.git
     ```
 2. Navigate to the project directory:   
     ```
-    cd Python_template
+    cd Image_Classifier_CNN
     ```
 3. Install the required dependencies using pip:
     ```
