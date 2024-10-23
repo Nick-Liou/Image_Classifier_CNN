@@ -25,7 +25,7 @@ A template for Python projects with github actions for
 
 
 <!-- 
-Use  "pipreqs . --mode no-pin" to auto generate the requirements 
+Use  "pipreqs . --mode no-pin --force" to auto generate the requirements 
 note it may not work recursively  
 -->
 

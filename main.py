@@ -6,9 +6,9 @@ import numpy as np
 from keras.callbacks import EarlyStopping
 from keras import layers, models
 
-def main() -> None:
+from edav import *
 
-    show_image = False
+def main() -> None:
 
     # Load the CIFAR-10 dataset
     test_images: np.ndarray
@@ -39,22 +39,11 @@ def main() -> None:
     class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                 'dog', 'frog', 'horse', 'ship', 'truck']
     
-    if show_image : 
-        # Plot 4 random images per class
-        fig, axes = plt.subplots(10, 4, figsize=(10, 25))
-        # fig.subplots_adjust(hspace=0.5, wspace=0.5)
-        fig.subplots_adjust(left=0, right=1, bottom=0, top=1, hspace=0.05, wspace=0.05)
+    # plot_histogram(train_labels , class_names)
+    
+    plot_random_images(train_images  ,train_labels  , class_names , 4 )
 
-        for class_idx in range(10):
-            class_images = train_images[train_labels[:, 0] == class_idx]
-            random_indices = np.random.choice(len(class_images), 4, replace=False)
-            for img_idx, ax in zip(random_indices, axes[class_idx]):
-                ax.imshow(class_images[img_idx])
-                ax.set_title(class_names[class_idx])
-                ax.axis('off')
-
-        plt.show()
-
+    return
 
 
     # Δημιουργία του CNN μοντέλου
@@ -137,19 +126,19 @@ def main() -> None:
 if __name__ == "__main__":
 
     
-    # Check if TensorFlow detects the GPU
-    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    # # Check if TensorFlow detects the GPU
+    # print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
-    # Check GPU device name and confirm that cuDNN is being used
-    gpu_devices = tf.config.list_physical_devices('GPU')
-    if gpu_devices:
-        for gpu in gpu_devices:
-            print(f"Device Name: {gpu.name}")
-            print(f"Device Type: {gpu.device_type}")
-
-
+    # # Check GPU device name and confirm that cuDNN is being used
+    # gpu_devices = tf.config.list_physical_devices('GPU')
+    # if gpu_devices:
+    #     for gpu in gpu_devices:
+    #         print(f"Device Name: {gpu.name}")
+    #         print(f"Device Type: {gpu.device_type}")
 
 
 
-    # main()
+
+
+    main()
 
