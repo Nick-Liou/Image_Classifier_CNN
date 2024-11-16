@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 from keras.callbacks import EarlyStopping
 from keras import layers, models
@@ -105,9 +106,10 @@ def main(classifier_id : int = 0) -> None:
     # y_val =  keras.utils.to_categorical(val_labels, n_classes)    
     print("Normalization and one-hot encoding completed")
 
-    # Initialize a DataFrame to store results
-    results_df = pd.DataFrame(columns=['Classifier Name', 'Set Type', 'Number of samples', 'Accuracy', 'Precision', 'Recall', 'F1-score'])
 
+    # Initialize a list to store results
+    results_list = []
+    
 
 	# Define EarlyStopping criteria
     early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
@@ -168,42 +170,50 @@ def main(classifier_id : int = 0) -> None:
         
         # Calculate metrics for train, validation, and test sets
         print(f"Metrics for Fold {fold + 1}:")
-        for (x , y, name) in [[x_train_fold,y_train_fold,"Train"], [x_val_fold,y_val_fold,"Validation"], [x_test,y_test,"Test"]  ] :
+        for (x , y, set_name) in [[x_train_fold,y_train_fold,"Train"], [x_val_fold,y_val_fold,"Validation"], [x_test,y_test,"Test"] ] :
 
-            print(x,y, name)
+            print(x,y, set_name)
 
             y_true = y.argmax(axis=1)
             y_pred = model.predict(x).argmax(axis=1)
 
-            print(f"{name} set metrics:")
+            print(f"{set_name} set metrics:")
             train_accuracy = accuracy_score(y_true, y_pred)
             train_precision = precision_score(y_true, y_pred, average='weighted')
             train_recall = recall_score(y_true, y_pred, average='weighted')
             train_f1 = f1_score(y_true, y_pred, average='weighted')
             print(f"Accuracy: {train_accuracy}, Precision: {train_precision}, Recall: {train_recall}, F1-Score: {train_f1}")
 
-            # Append the metrics for each set to the results DataFrame
-            temp_df = pd.DataFrame({
-                "Classifier Name": [f"CNN_Classifier_{classifier_id}"],
-                "Set Type": [name],
-                "Number of samples": [len(x)],
-                "Accuracy": [train_accuracy],
-                "Precision": [train_precision],
-                "Recall": [train_recall],
-                "F1-score": [train_f1]
-            })
 
-            # Concatenate the current fold's results to the results DataFrame
-            results_df = pd.concat([results_df, temp_df], ignore_index=True)
+            # Collect the metrics for each set in a dictionary
+            results_list.append({
+                "Classifier Name": f"CNN_Classifier_{classifier_id}",
+                "Set Type": set_name,
+                "Number of samples": len(x),
+                "Accuracy": train_accuracy,
+                "Precision": train_precision,
+                "Recall": train_recall,
+                "F1-score": train_f1
+            })
 
             # Print the confusion matrix for the train, validation, and test sets
             cm = confusion_matrix(y_true, y_pred)
 
-            print(f"Confusion Matrix - {name}:")
+            print(f"Confusion Matrix - {set_name}:")
             print(cm)
 
+            # Plotting the confusion matrix
+            plt.figure(figsize=(10, 8))
+            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+            plt.title(f"Confusion Matrix - {set_name}")
+            plt.xlabel('Predicted Labels')
+            plt.ylabel('True Labels')
+            plt.show()
 
-        
+
+    
+    # Create a DataFrame from the list of results
+    results_df = pd.DataFrame(results_list)
     # Display the results
     print(results_df)
 
