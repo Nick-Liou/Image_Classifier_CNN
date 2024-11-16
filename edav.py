@@ -24,7 +24,7 @@ def plot_histogram(observations: np.ndarray, names: List[str] , data_name: str =
     total_count = sum(counts)
     
     # Create figure and axis objects
-    fig, ax1 = plt.subplots()
+    fig, ax1 = plt.subplots(figsize=(9, 5))
 
     # x-axis positions for the bars
     x_positions = np.arange(len(counts))

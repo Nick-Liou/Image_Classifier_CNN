@@ -88,7 +88,6 @@ def main(classifier_id : int = 0) -> None:
     if show_edav : 
         # Plot histograms
         plot_histogram(train_labels , class_names , "train")
-        # plot_histogram(val_labels , class_names , "validation")
         plot_histogram(test_labels , class_names , "test")
 
         plot_random_images(train_images  ,train_labels  , class_names , 4 )
@@ -171,8 +170,6 @@ def main(classifier_id : int = 0) -> None:
         # Calculate metrics for train, validation, and test sets
         print(f"Metrics for Fold {fold + 1}:")
         for (x , y, set_name) in [[x_train_fold,y_train_fold,"Train"], [x_val_fold,y_val_fold,"Validation"], [x_test,y_test,"Test"] ] :
-
-            print(x,y, set_name)
 
             y_true = y.argmax(axis=1)
             y_pred = model.predict(x).argmax(axis=1)
