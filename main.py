@@ -5,43 +5,53 @@ import numpy as np
 
 from keras.callbacks import EarlyStopping
 from keras import layers, models
+from sklearn.model_selection import train_test_split
 
 from edav import *
 
 def main() -> None:
 
+    show_edav = True
+    debug = True
+
     # Load the CIFAR-10 dataset
     test_images: np.ndarray
     (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.cifar10.load_data()
+    print("Dataset download completed")
 
+    # CIFAR-10 class labels
+    class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
+                'dog', 'frog', 'horse', 'ship', 'truck']
+    
     assert train_images.shape == (50000, 32, 32, 3)
     assert test_images.shape == (10000, 32, 32, 3)
     assert train_labels.shape == (50000, 1)
     assert test_labels.shape == (10000, 1)
 
 
-    # Print the shape of the dataset
-    print(f"Training data shape: {train_images.shape}, Training labels shape: {train_labels.shape}")
-    print(f"Test data shape: {test_images.shape}, Test labels shape: {test_labels.shape}")
-
-    from sklearn.model_selection import train_test_split
+    ####### DEBUG #######
+    # Print the shape of the datasets
 
 
     train_images, val_images, train_labels, val_labels = train_test_split(train_images, train_labels, test_size=0.05, random_state=42, stratify=train_labels)
-
-
-    print(f"New Training data shape: {train_images.shape}, Training labels shape: {train_labels.shape}")
-    print(f"Validation data shape: {val_images.shape}, Validation labels shape: {val_labels.shape}")
-
-
     
-    # CIFAR-10 class labels
-    class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-                'dog', 'frog', 'horse', 'ship', 'truck']
-    
-    # plot_histogram(train_labels , class_names)
-    
-    plot_random_images(train_images  ,train_labels  , class_names , 4 )
+    if debug :
+        print("Shape of training images:", train_images.shape)
+        print("Shape of training labels:", train_labels.shape)
+        print("Shape of testing images:", test_images.shape)
+        print("Shape of testing labels:", test_labels.shape)
+        print("Shape of validation images:", val_images.shape)
+        print("Shape of validation labels:", val_labels.shape)
+
+
+    if show_edav : 
+        # Plot histograms
+        plot_histogram(train_labels , class_names , "train")
+        plot_histogram(val_labels , class_names , "validation")
+        plot_histogram(test_labels , class_names , "test")
+
+        plot_random_images(train_images  ,train_labels  , class_names , 4 )
+
 
     return
 

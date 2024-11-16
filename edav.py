@@ -2,7 +2,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_histogram(observations: np.ndarray, names: List[str]) -> None:
+def plot_histogram(observations: np.ndarray, names: List[str] , data_name: str = "train") -> None:
     """
     Creates a histogram with labeled bars and a y-axis for frequency percentage.
     
@@ -36,7 +36,7 @@ def plot_histogram(observations: np.ndarray, names: List[str]) -> None:
     bars = ax1.bar(x_positions, frequencies, color='skyblue')
     
     # Set labels for the x-axis and y-axis (only frequency percentage on y-axis)    
-    plt.title("Frequencies of training data")
+    plt.title(f"Frequencies of {data_name} data")
     ax1.set_xlabel('Categories')
     ax1.set_ylabel('Frequency (%)', color='black')
     
