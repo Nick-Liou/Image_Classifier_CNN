@@ -9,6 +9,8 @@ from keras import layers, models
 import keras
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, f1_score
+
 from typing import Any
 
 from edav import *
@@ -131,46 +133,79 @@ def main(classifier_id : int = 0) -> None:
         model = create_model(classifier_id)
 
 
+        # Train the model
+        print("Starting model training...")
+        history = model.fit(x_train_fold, y_train_fold, batch_size=128, epochs=50, validation_data=(x_val_fold, y_val_fold), callbacks=[early_stopping])
+        print("Training completed.")
 
-    return
-    
+
+        
+        print(f"Plotting loss curves for Fold {fold + 1}...")
+
+        plt.figure(figsize=(12, 6))
+
+        # Loss curve
+        plt.subplot(1, 2, 1)
+        plt.plot(history.history['loss'], label='Training Loss')
+        plt.plot(history.history['val_loss'], label='Validation Loss')
+        plt.title(f'Training and Validation Loss for Fold {fold + 1}')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.legend()
+
+        # Accuracy curve
+        plt.subplot(1, 2, 2)
+        plt.plot(history.history['accuracy'], label='Training Accuracy')
+        plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+        plt.title(f'Training and Validation Accuracy for Fold {fold + 1}')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.legend()
+
+        plt.show()
+
+        
+        
+        # Calculate metrics for train, validation, and test sets
+        print(f"Metrics for Fold {fold + 1}:")
+        for (x , y, name) in [[x_train_fold,y_train_fold,"Train"], [x_val_fold,y_val_fold,"Validation"], [x_test,y_test,"Test"]  ] :
+
+            print(x,y, name)
+
+            y_true = y.argmax(axis=1)
+            y_pred = model.predict(x).argmax(axis=1)
+
+            print(f"{name} set metrics:")
+            train_accuracy = accuracy_score(y_true, y_pred)
+            train_precision = precision_score(y_true, y_pred, average='weighted')
+            train_recall = recall_score(y_true, y_pred, average='weighted')
+            train_f1 = f1_score(y_true, y_pred, average='weighted')
+            print(f"Accuracy: {train_accuracy}, Precision: {train_precision}, Recall: {train_recall}, F1-Score: {train_f1}")
+
+            # Append the metrics for each set to the results DataFrame
+            temp_df = pd.DataFrame({
+                "Classifier Name": [f"CNN_Classifier_{classifier_id}"],
+                "Set Type": [name],
+                "Number of samples": [len(x)],
+                "Accuracy": [train_accuracy],
+                "Precision": [train_precision],
+                "Recall": [train_recall],
+                "F1-score": [train_f1]
+            })
+
+            # Concatenate the current fold's results to the results DataFrame
+            results_df = pd.concat([results_df, temp_df], ignore_index=True)
+
+            # Print the confusion matrix for the train, validation, and test sets
+            cm = confusion_matrix(y_true, y_pred)
+
+            print(f"Confusion Matrix - {name}:")
+            print(cm)
 
 
-	# Train the model
-    print("Starting model training...")
-    history = model.fit(
-        train_images, train_labels, 
-        epochs=50, 
-        validation_data=(val_images, val_labels), 
-        callbacks=[early_stopping]
-    )
-
-    print("Training completed.")
-
-    # 6. Εμφάνιση των loss curves (training & validation)
-    print("Plotting loss curves...")
-    plt.figure(figsize=(12, 4))
-
-    # Loss curve
-    plt.subplot(1, 2, 1)
-    plt.plot(history.history['loss'], label='Training Loss')
-    plt.plot(history.history['val_loss'], label='Validation Loss')
-    plt.title('Training and Validation Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-
-    # Accuracy curve
-    plt.subplot(1, 2, 2)
-    plt.plot(history.history['accuracy'], label='Training Accuracy')
-    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
-    plt.title('Training and Validation Accuracy')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
-
-    plt.show()
-
+        
+    # Display the results
+    print(results_df)
 
 
 if __name__ == "__main__":
