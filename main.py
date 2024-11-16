@@ -129,6 +129,33 @@ def main(classifier_id : int = 0) -> None:
         if show_edav:            
             plot_histogram(np.argmax(y_train_fold, axis=1), class_names , f"fold {fold + 1}/{num_folds} train")
             plot_histogram(np.argmax(y_val_fold, axis=1) , class_names , f"fold {fold + 1}/{num_folds} validation")
+
+            
+            # Convert y_train_fold to a pandas Series (if it's not already)
+            y_series = pd.Series(y_train_fold.argmax(axis=1))
+
+            # Replace numeric labels with class names
+            y_named_series = y_series.map(lambda x: class_names[x])
+
+            # Plot with labeled categories
+            plt.figure(figsize=(12, 6))
+            plt.scatter(y_named_series.index, y_named_series, marker='o', label='Labels', alpha=0.6)
+            plt.title('Time Series Plot of y_train_fold with Class Names', fontsize=14)
+            plt.xlabel('Time (Index)', fontsize=12)
+            plt.ylabel('Class Name', fontsize=12)
+            plt.grid(axis='y')
+            plt.legend()
+            # plt.show()
+
+
+            plt.figure(figsize=(12, 6))
+            sns.scatterplot(x=y_named_series.index, y=y_named_series, hue=y_named_series, palette='tab10') #, s=50
+            plt.title('Time Series Plot of y_train_fold with Class Names', fontsize=14)
+            plt.xlabel('Time (Index)', fontsize=12)
+            plt.ylabel('Class Name', fontsize=12)
+            plt.grid(axis='y')
+            plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            plt.show()
             
             
         model = create_model(classifier_id)
