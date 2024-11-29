@@ -2,7 +2,7 @@ from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_histogram(observations: np.ndarray, names: List[str] , data_name: str = "train") -> None:
+def plot_histogram(observations: np.ndarray, names: List[str] , data_name: str = "train" , save_folder: str = "") -> None:
     """
     Creates a histogram with labeled bars and a y-axis for frequency percentage.
     
@@ -55,9 +55,15 @@ def plot_histogram(observations: np.ndarray, names: List[str] , data_name: str =
 
     # Show the plot
     plt.tight_layout()
+
+    if save_folder != "" :
+        # Save to the specified folder
+        plt.savefig(f"{save_folder}/plot_hist_{data_name.replace(' ','_').replace('/','_')}.eps", format='eps')
+    
     plt.show()
 
-def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class_names: List[str], im_per_class: int = 4) -> None:
+
+def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class_names: List[str], im_per_class: int = 4 , save_folder: str = "")  -> None:
     """
     Plots a grid of random images for each class from the training dataset.
 
@@ -114,9 +120,16 @@ def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class
 
     # Apply tight layout to ensure the subplots fit well in the figure area
     plt.tight_layout()
+    
+    if save_folder != "" :
+        # Save to the specified folder    
+        file_name = f"{save_folder}/plot_radom_images.eps"
+        plt.savefig(file_name, format='eps')
 
     # Show the figure
     plt.show()
+
+    
 
 
 if __name__ == "__main__":

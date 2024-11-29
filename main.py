@@ -4,6 +4,8 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import datetime
+import os
 
 from keras.callbacks import EarlyStopping
 from keras import layers, models
@@ -57,6 +59,20 @@ def main(classifier_id : int = 0) -> None:
 
     show_edav = True
     debug = True
+    model_save_folder = "Trained_models"
+    os.makedirs(model_save_folder, exist_ok=True)  # Create folder if it doesn't exist    
+    save_model = True
+
+    # Set to "" to not save plots
+    plot_save_folder = "Saved_Plots"
+    os.makedirs(plot_save_folder, exist_ok=True)  # Create folder if it doesn't exist
+
+
+    # from keras.models import load_model
+    # # Load the model from the .h5 file
+    # loaded_model = load_model('my_model.h5')
+
+    
 
     # Load the CIFAR-10 dataset
     test_images: np.ndarray
@@ -87,10 +103,10 @@ def main(classifier_id : int = 0) -> None:
 
     if show_edav : 
         # Plot histograms
-        plot_histogram(train_labels , class_names , "train")
-        plot_histogram(test_labels , class_names , "test")
+        plot_histogram(train_labels , class_names , "train", save_folder=plot_save_folder)
+        plot_histogram(test_labels , class_names , "test", save_folder=plot_save_folder)
 
-        plot_random_images(train_images  ,train_labels  , class_names , 4 )
+        plot_random_images(train_images  ,train_labels  , class_names , 4 , save_folder=plot_save_folder )
 
 
 
@@ -127,8 +143,8 @@ def main(classifier_id : int = 0) -> None:
         x_val_fold, y_val_fold = x_train[val_indices], y_train[val_indices]
 
         if show_edav:            
-            plot_histogram(np.argmax(y_train_fold, axis=1), class_names , f"fold {fold + 1}/{num_folds} train")
-            plot_histogram(np.argmax(y_val_fold, axis=1) , class_names , f"fold {fold + 1}/{num_folds} validation")
+            plot_histogram(np.argmax(y_train_fold, axis=1), class_names , f"fold {fold + 1}/{num_folds} train" , save_folder= plot_save_folder)
+            plot_histogram(np.argmax(y_val_fold, axis=1) , class_names , f"fold {fold + 1}/{num_folds} validation", save_folder= plot_save_folder)
 
             
             # Convert y_train_fold to a pandas Series (if it's not already)
@@ -163,9 +179,29 @@ def main(classifier_id : int = 0) -> None:
 
         # Train the model
         print("Starting model training...")
-        history = model.fit(x_train_fold, y_train_fold, batch_size=128, epochs=50, validation_data=(x_val_fold, y_val_fold), callbacks=[early_stopping])
+        history = model.fit(x_train_fold, y_train_fold, batch_size=128, epochs=5, validation_data=(x_val_fold, y_val_fold), callbacks=[early_stopping])
         print("Training completed.")
 
+
+       
+        if save_model:
+            # Get the current date and time
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            
+            # Extract the final training and validation accuracy
+            train_accuracy = history.history['accuracy'][-1]  # Last epoch training accuracy
+            val_accuracy = history.history['val_accuracy'][-1]  # Last epoch validation accuracy
+            
+            # Format the accuracies as percentages
+            train_accuracy = round(train_accuracy * 100, 2)
+            val_accuracy = round(val_accuracy * 100, 2)
+            
+            # Construct the file name with the accuracies
+            model_file_name = f"{model_save_folder}/model{classifier_id}_acc{train_accuracy}_valacc{val_accuracy}_f{fold+1}_{current_time}.h5"
+            
+            print(f"Saving model to: {model_file_name}")
+            # Save the model
+            model.save(model_file_name)
 
         
         print(f"Plotting loss curves for Fold {fold + 1}...")
