@@ -63,13 +63,13 @@ def plot_histogram(observations: np.ndarray, names: List[str] , data_name: str =
     plt.show()
 
 
-def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class_names: List[str], im_per_class: int = 4 , save_folder: str = "")  -> None:
+def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class_names: List[str], im_per_class: int = 4 , save_folder: str = "" , label_origin: str = "data")  -> None:
     """
     Plots a grid of random images for each class from the training dataset.
 
     Args:
         train_images (np.ndarray): Array of training images. Expected shape is (num_samples, height, width, channels).
-        train_labels (np.ndarray): Array of training labels. Expected shape is (num_samples, 1) or similar.
+        train_labels (np.ndarray): Array of training labels. Expected shape is (num_samples, 1) or (num_samples,) or similar.
         class_names (List[str]): List of class names corresponding to the class indices.
         im_per_class (int): Number of random images to display per class. Defaults to 4.
 
@@ -125,7 +125,7 @@ def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class
     
     if save_folder != "" :
         # Save to the specified folder    
-        file_name = f"{save_folder}/plot_radom_images.eps"
+        file_name = f"{save_folder}/plot_radom_images_{label_origin}.eps"
         plt.savefig(file_name, format='eps')
 
     # Show the figure

@@ -144,7 +144,7 @@ def main(classifier_id : int = 0) -> None:
     
 
     # Set to "" to not save plots
-    # plot_save_folder = "Saved_Plots"
+    plot_save_folder = f"Saved_Plots_from_model_{classifier_id}"
     plot_save_folder = ""
     if plot_save_folder != "":
         os.makedirs(plot_save_folder, exist_ok=True)  # Create folder if it doesn't exist
@@ -351,7 +351,7 @@ def main(classifier_id : int = 0) -> None:
 
             # Prediction Based Image Plots
             if set_name == "Test":                
-                plot_random_images(x,y_pred,class_names, save_folder=plot_save_folder)
+                plot_random_images(x,y_pred,class_names, save_folder=plot_save_folder , label_origin= f"pred_fold_{fold+1}")
 
 
 
