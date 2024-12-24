@@ -80,6 +80,8 @@ def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class
     # Number of classes based on the length of class_names
     num_classes = len(class_names)
 
+    train_labels = train_labels.squeeze()
+
     # Create a figure with subplots (rows = im_per_class, columns = num_classes)
     fig, axes = plt.subplots(im_per_class, num_classes, figsize=(13, 7))
 
@@ -89,7 +91,7 @@ def plot_random_images(train_images: np.ndarray, train_labels: np.ndarray, class
     # Loop through each class
     for class_idx in range(num_classes):
         # Get all images corresponding to the current class
-        class_images = train_images[train_labels[:, 0] == class_idx]
+        class_images = train_images[train_labels == class_idx]
 
         # Randomly select `im_per_class` images from the class
         random_indices = np.random.choice(len(class_images), im_per_class, replace=False)

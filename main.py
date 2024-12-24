@@ -1,4 +1,6 @@
     
+# from google.colab import drive
+
 from matplotlib import pyplot as plt
 import tensorflow as tf
 import numpy as np
@@ -24,9 +26,9 @@ def create_model(classifier_id : int = 0 ) -> tf.keras.Model:
     input_shape = (32, 32, 3)
 
     # Set learning rate and regularization
-    learning_rate = 0.001   # Try 0.001, 0.01, 0.005, 0.0001, 0.00001
-    weight_decay = 0.01     # Try 0.004
-    optimizer=tf.keras.optimizers.AdamW(learning_rate=learning_rate, weight_decay=weight_decay)   # Try adam, SGD
+    # learning_rate = 0.001   # Try 0.001, 0.01, 0.005, 0.0001, 0.00001
+    # weight_decay = 0.01     # Try 0.004
+    # optimizer=tf.keras.optimizers.AdamW(learning_rate=learning_rate, weight_decay=weight_decay)   # Try adam, SGD
 
     # Add the Input layer with the specified shape
     model.add(layers.Input(shape=input_shape))
@@ -54,7 +56,8 @@ def create_model(classifier_id : int = 0 ) -> tf.keras.Model:
         model.add(layers.Dense(10, activation='softmax'))
 
         # Compile the model
-        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        # model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
     elif classifier_id == 1:  # Model 2
         # Convolutional layers
@@ -121,15 +124,30 @@ def create_model(classifier_id : int = 0 ) -> tf.keras.Model:
 
 def main(classifier_id : int = 0) -> None:
 
+    save_model = False
     show_edav = True
     debug = True
-    model_save_folder = "Trained_models"
+    local_run = True
+
+    if local_run :
+        model_save_folder = "Trained_models"
+    else:
+        # Mount Google Drive
+        drive.mount('/content/drive')
+        print("Google Drive mounted succesfully")
+
+        # Specify Google Drive path
+        model_save_folder = "/content/drive/MyDrive/Trained_models"
+
     os.makedirs(model_save_folder, exist_ok=True)  # Create folder if it doesn't exist    
-    save_model = True
+    print(f"Model save folder: {model_save_folder}")
+    
 
     # Set to "" to not save plots
-    plot_save_folder = "Saved_Plots"
-    os.makedirs(plot_save_folder, exist_ok=True)  # Create folder if it doesn't exist
+    # plot_save_folder = "Saved_Plots"
+    plot_save_folder = ""
+    if plot_save_folder != "":
+        os.makedirs(plot_save_folder, exist_ok=True)  # Create folder if it doesn't exist
 
 
     # from keras.models import load_model
@@ -152,17 +170,15 @@ def main(classifier_id : int = 0) -> None:
     assert train_labels.shape == (50000, 1)
     assert test_labels.shape == (10000, 1)
 
+    print(f"We have {len(train_images)} training examples of size {train_images.shape[1:3]} and {len(test_images)} testing examples of size {test_images.shape[1:3]}")
+    print(f"Dataset labels: {class_names}")
 
-
-    # train_images, val_images, train_labels, val_labels = train_test_split(train_images, train_labels, test_size=0.05, random_state=42, stratify=train_labels)
-    
     if debug :
         print("Shape of training images:", train_images.shape)
         print("Shape of training labels:", train_labels.shape)
         print("Shape of testing images:", test_images.shape)
         print("Shape of testing labels:", test_labels.shape)
-        # print("Shape of validation images:", val_images.shape)
-        # print("Shape of validation labels:", val_labels.shape)
+        
 
 
     if show_edav : 
@@ -174,7 +190,7 @@ def main(classifier_id : int = 0) -> None:
 
 
 
-    # # Normalization
+    # Normalization
     x_train = train_images.astype('float32') / 255
     x_test = test_images.astype('float32') / 255
 
@@ -182,7 +198,6 @@ def main(classifier_id : int = 0) -> None:
     n_classes = 10
     y_train = keras.utils.to_categorical(train_labels, n_classes)
     y_test = keras.utils.to_categorical(test_labels, n_classes)
-    # y_val =  keras.utils.to_categorical(val_labels, n_classes)    
     print("Normalization and one-hot encoding completed")
 
 
@@ -228,13 +243,13 @@ def main(classifier_id : int = 0) -> None:
             # plt.show()
 
 
-            plt.figure(figsize=(12, 6))
-            sns.scatterplot(x=y_named_series.index, y=y_named_series, hue=y_named_series, palette='tab10') #, s=50
-            plt.title('Time Series Plot of y_train_fold with Class Names', fontsize=14)
-            plt.xlabel('Time (Index)', fontsize=12)
-            plt.ylabel('Class Name', fontsize=12)
-            plt.grid(axis='y')
-            plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+            # plt.figure(figsize=(12, 6))
+            # sns.scatterplot(x=y_named_series.index, y=y_named_series, hue=y_named_series, palette='tab10') #, s=50
+            # plt.title('Time Series Plot of y_train_fold with Class Names', fontsize=14)
+            # plt.xlabel('Time (Index)', fontsize=12)
+            # plt.ylabel('Class Name', fontsize=12)
+            # plt.grid(axis='y')
+            # plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
             plt.show()
             
             
@@ -243,7 +258,7 @@ def main(classifier_id : int = 0) -> None:
 
         # Train the model
         print("Starting model training...")
-        history = model.fit(x_train_fold, y_train_fold, batch_size=128, epochs=5, validation_data=(x_val_fold, y_val_fold), callbacks=[early_stopping])
+        history = model.fit(x_train_fold, y_train_fold, batch_size=128, epochs=2, validation_data=(x_val_fold, y_val_fold), callbacks=[early_stopping])
         print("Training completed.")
 
 
@@ -261,7 +276,7 @@ def main(classifier_id : int = 0) -> None:
             val_accuracy = round(val_accuracy * 100, 2)
             
             # Construct the file name with the accuracies
-            model_file_name = f"{model_save_folder}/model{classifier_id}_acc{train_accuracy}_valacc{val_accuracy}_f{fold+1}_{current_time}.h5"
+            model_file_name = f"{model_save_folder}/model{classifier_id}_acc{train_accuracy}_valacc{val_accuracy}_f{fold+1}_{current_time}.keras"
             
             print(f"Saving model to: {model_file_name}")
             # Save the model
@@ -333,6 +348,11 @@ def main(classifier_id : int = 0) -> None:
             plt.xlabel('Predicted Labels')
             plt.ylabel('True Labels')
             plt.show()
+
+            # Prediction Based Image Plots
+            if set_name == "Test":                
+                plot_random_images(x,y_pred,class_names, save_folder=plot_save_folder)
+
 
 
     
