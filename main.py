@@ -130,21 +130,22 @@ def main(classifier_id : int = 0) -> None:
     local_run = True
 
     if local_run :
-        model_save_folder = "Trained_models"
+        drive_path = ""
     else:
         # Mount Google Drive
         drive.mount('/content/drive')
         print("Google Drive mounted succesfully")
 
-        # Specify Google Drive path
-        model_save_folder = "/content/drive/MyDrive/Trained_models"
+        drive_path = "/content/drive/MyDrive/MLCV_HW1/"
+
+    model_save_folder = f"{drive_path}/Model_structure_{classifier_id}/Trained_models"
 
     os.makedirs(model_save_folder, exist_ok=True)  # Create folder if it doesn't exist    
     print(f"Model save folder: {model_save_folder}")
     
 
     # Set to "" to not save plots
-    plot_save_folder = f"Saved_Plots_from_model_{classifier_id}"
+    plot_save_folder = f"{drive_path}/Model_structure_{classifier_id}/Saved_Plots_from_model"
     plot_save_folder = ""
     if plot_save_folder != "":
         os.makedirs(plot_save_folder, exist_ok=True)  # Create folder if it doesn't exist
