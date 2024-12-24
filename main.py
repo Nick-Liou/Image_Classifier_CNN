@@ -21,38 +21,102 @@ from edav import *
 
 def create_model(classifier_id : int = 0 ) -> tf.keras.Model:
     model:tf.keras.Model = models.Sequential()
-        
-    # Define the input layer first
-    # model.add(layers.InputLayer(shape=(32, 32, 3)))
+    input_shape = (32, 32, 3)
 
-    # 1st Convolutional Block    
-    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Dropout(0.25))
+    # Set learning rate and regularization
+    learning_rate = 0.001   # Try 0.001, 0.01, 0.005, 0.0001, 0.00001
+    weight_decay = 0.01     # Try 0.004
+    optimizer=tf.keras.optimizers.AdamW(learning_rate=learning_rate, weight_decay=weight_decay)   # Try adam, SGD
 
-    # 2nd Convolutional Block
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Dropout(0.25))
+    # Add the Input layer with the specified shape
+    model.add(layers.Input(shape=input_shape))
 
-    # 3rd Convolutional Block
-    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-    model.add(layers.MaxPooling2D((2, 2)))
-    model.add(layers.Dropout(0.25))
+    if classifier_id == 0:  # Model 1
+        # Convolutional layers
+        model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
 
-    # Flatten and then add Fully Connected Layers
-    model.add(layers.Flatten())
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dropout(0.5))
+        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
 
-    # Output layer
-    model.add(layers.Dense(10, activation='softmax'))
+        model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
 
-	# Compile the model
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    # "sparse_categorical_crossentropy"
+        # Flatten the output of the convolutional layers
+        model.add(layers.Flatten())
+
+        # Fully connected layers
+        model.add(layers.Dense(128, activation='relu'))
+        model.add(layers.Dropout(0.5))
+        model.add(layers.Dense(10, activation='softmax'))
+
+        # Compile the model
+        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+
+    elif classifier_id == 1:  # Model 2
+        # Convolutional layers
+        model.add(layers.Conv2D(32, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+        model.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        # Flatten the output of the convolutional layers
+        model.add(layers.Flatten())
+
+        # Fully connected layers
+        model.add(layers.Dense(128, activation='relu'))
+        model.add(layers.Dropout(0.5))
+        model.add(layers.Dense(10, activation='softmax'))
+
+        # Compile the model, changed loss function to sparse categorical cross entropy
+        model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+    elif classifier_id == 2:  # Model 3
+        # Convolutional Layers
+        model.add(layers.Conv2D(32, (3, 3), activation='relu', padding='same'))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        model.add(layers.Conv2D(64, (3, 3), activation='relu', padding='same'))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        model.add(layers.Conv2D(128, (3, 3), activation='relu', padding='same'))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
+        model.add(layers.MaxPooling2D((2, 2)))
+        model.add(layers.Dropout(0.25))
+
+        # Flatten
+        model.add(layers.Flatten())
+
+        # Fully connected layers
+        model.add(layers.Dense(512, activation='relu'))
+        model.add(layers.Dropout(0.5))
+        model.add(layers.Dense(128, activation='relu'))
+        model.add(layers.Dropout(0.5))
+        model.add(layers.Dense(10, activation='softmax'))
+
+        # Compile the model
+        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+
+    else:
+        raise ValueError("Invalid classifier_id.")
 
     return model
+
 
 
 def main(classifier_id : int = 0) -> None:
