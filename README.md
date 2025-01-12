@@ -2,11 +2,6 @@
 [![Tests](https://github.com/Nick-Liou/Image_Classifier_CNN/actions/workflows/pytest.yml/badge.svg)](https://github.com/Nick-Liou/Image_Classifier_CNN/actions/workflows/pytest.yml)
 
 # Image_Classifier_CNN
-A template for Python projects with github actions for 
-- tests (with pytest)
-- type anotations (with Mypy)
-- automaticaly updating the badges and the Installation using the new username and repo name on creation
-
 
 ## Installation
 
